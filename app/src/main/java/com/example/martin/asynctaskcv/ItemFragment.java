@@ -17,7 +17,7 @@ import java.util.ArrayList;
  */
 public class ItemFragment extends Fragment {
 
-
+    //Only for this example this represents database
     private String[] databazaData = {"item 1", "item 2", "item 3", "item 4", "item 5", "item 6", "item 7", "item 8", "item 9", "item 10", "item 11", "item 12", "item 13", "item 14", "item 15", "item 16", "item 17", "item 18", "item 19", "item 20", "item 21", "item 22"};
     private AddStringTask addStringTask;
 
@@ -36,7 +36,7 @@ public class ItemFragment extends Fragment {
     public static ItemFragment newInstance(Context context) {
 
         ItemFragment fragment = new ItemFragment();
-        fragment.newArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1);
+        fragment.newArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1); //Creation of new ArrayAdpter
         return fragment;
     }
 
@@ -44,7 +44,7 @@ public class ItemFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //TODO Use this fragment as RetainFragment http://developer.android.com/guide/topics/resources/runtime-changes.html
-        setRetainInstance(true);
+        // hint: use retain instance;
     }
 
     /**
@@ -63,8 +63,7 @@ public class ItemFragment extends Fragment {
             model = new ArrayList<String>();
             newArrayAdapter.addAll(model);
             //TODO run AddStringTask as AsyncTask.execute
-            addStringTask = new AddStringTask();
-            addStringTask.execute();
+
         }
 
     }
@@ -78,32 +77,28 @@ public class ItemFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        //addStringTask.cancel(true);
+
     }
 
 
     //TODO use AsyncTask for filling newArrayAdapter with data from databazaData
     // Link: http://developer.android.com/reference/android/os/AsyncTask.html
     // Hint:
-    // Load data in 'for' cycle. Every cycle iteration slowdown with use of 'SystemClock.sleep(500)' wich will emulate slow loading
-    // For adding data to 'arrryAdapter' use : newArrayAdapter.add(values[0])
+    // Load data in 'for' cycle. Every cycle iteration slowdown with use of 'SystemClock.sleep(500)' wich will emulate slow loading from database
+    // For adding data to 'arrryAdapter' use : newArrayAdapter.add(values[0]); newArrayAdapter.notifyDataSetChanged();
+    // Note: Only main(UI) thread can interact with UI views and ArrayAdapter is a part of ListView
 
     class AddStringTask extends AsyncTask<Void, String, Void> {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            for (String s : databazaData) {
-                publishProgress(s);
-                SystemClock.sleep(500);
-            }
             return null;
         }
 
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
-            newArrayAdapter.add(values[0]);
-            newArrayAdapter.notifyDataSetChanged();
+
         }
     }
 
