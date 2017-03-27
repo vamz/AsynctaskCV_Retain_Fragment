@@ -1,9 +1,10 @@
 package com.example.martin.asynctaskcv;
 
 import android.app.Activity;
+import android.app.Fragment;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.ListFragment;
 import android.os.SystemClock;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -12,23 +13,30 @@ import android.widget.ListView;
 import java.util.ArrayList;
 
 /**
- * A fragment representing a list of Items.
- * <p/>
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
- * interface.
+ *
  */
-public class ItemFragment extends ListFragment {
+public class ItemFragment extends Fragment {
 
 
     private String[] databazaData = {"item 1", "item 2", "item 3", "item 4", "item 5", "item 6", "item 7", "item 8", "item 9", "item 10", "item 11", "item 12", "item 13", "item 14", "item 15", "item 16", "item 17", "item 18", "item 19", "item 20", "item 21", "item 22"};
+    private AddStringTask addStringTask;
+
+    public ArrayList<String> getModel() {
+        return model;
+    }
+
     private ArrayList<String> model;
+
+    public ArrayAdapter<String> getNewArrayAdapter() {
+        return newArrayAdapter;
+    }
+
     private ArrayAdapter<String> newArrayAdapter;
-    private OnFragmentInteractionListener mListener;
 
+    public static ItemFragment newInstance(Context context) {
 
-    public static ItemFragment newInstance() {
         ItemFragment fragment = new ItemFragment();
+        fragment.newArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1);
         return fragment;
     }
 
@@ -36,6 +44,7 @@ public class ItemFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //TODO Use this fragment as RetainFragment http://developer.android.com/guide/topics/resources/runtime-changes.html
+        setRetainInstance(true);
     }
 
     /**
@@ -43,6 +52,7 @@ public class ItemFragment extends ListFragment {
      * fragment (e.g. upon screen orientation changes).
      */
     public ItemFragment() {
+
     }
 
     @Override
@@ -51,47 +61,26 @@ public class ItemFragment extends ListFragment {
 
         if (model == null) {
             model = new ArrayList<String>();
+            newArrayAdapter.addAll(model);
             //TODO run AddStringTask as AsyncTask.execute
+            addStringTask = new AddStringTask();
+            addStringTask.execute();
         }
 
-
-        //newArrayAdapter = //TODO create new arrayAdapter //
-        setListAdapter(newArrayAdapter);
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
+
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        //addStringTask.cancel(true);
     }
 
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-        if (null != mListener) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            mListener.onFragmentInteraction(model.get(position));
-        }
-    }
-
-
-    public interface OnFragmentInteractionListener {
-
-        public void onFragmentInteraction(String item);
-    }
 
     //TODO use AsyncTask for filling newArrayAdapter with data from databazaData
     // Link: http://developer.android.com/reference/android/os/AsyncTask.html
@@ -100,6 +89,22 @@ public class ItemFragment extends ListFragment {
     // For adding data to 'arrryAdapter' use : newArrayAdapter.add(values[0])
 
     class AddStringTask extends AsyncTask<Void, String, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            for (String s : databazaData) {
+                publishProgress(s);
+                SystemClock.sleep(500);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            newArrayAdapter.add(values[0]);
+            newArrayAdapter.notifyDataSetChanged();
+        }
     }
 
 }
